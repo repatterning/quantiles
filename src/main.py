@@ -13,6 +13,8 @@ def main():
 
     logger.info(arguments)
 
+    # Cache
+    src.functions.cache.Cache().exc()
 
 
 if __name__ == '__main__':
