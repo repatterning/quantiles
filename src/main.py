@@ -13,6 +13,10 @@ def main():
 
     logger.info(arguments)
 
+    assets = src.assets.interface.Interface(
+        service=service, s3_parameters=s3_parameters, arguments=arguments).exc()
+    logger.info(assets)
+
     # Cache
     src.functions.cache.Cache().exc()
 
@@ -29,6 +33,7 @@ if __name__ == '__main__':
                         datefmt='%Y-%m-%d %H:%M:%S')
 
     # Modules
+    import src.assets.interface
     import src.elements.s3_parameters as s3p
     import src.elements.service as sr
     import src.functions.cache
