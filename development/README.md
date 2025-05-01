@@ -9,6 +9,7 @@
   * [Images](https://docs.aws.amazon.com/emr/latest/EMR-on-EKS-DevelopmentGuide/docker-custom-images-steps.html)
   * [Quickstart](https://docs.nvidia.com/spark-rapids/user-guide/latest/qualification/quickstart.html)
 * [Amazon EMR, Python, Spark](https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-gs.html#emr-getting-started-plan-and-configure)
+* [Amazon EMR, Dockerfile](https://github.com/awslabs/data-on-eks/blob/main/ai-ml/emr-spark-rapids/examples/xgboost/Dockerfile)
 * [Dockerfile](https://docs.docker.com/reference/dockerfile/)
 * [requirements.txt](https://pip.pypa.io/en/stable/reference/requirements-file-format/)
 
