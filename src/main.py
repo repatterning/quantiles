@@ -13,9 +13,13 @@ def main():
 
     logger.info(arguments)
 
-    assets = src.assets.interface.Interface(
+    partitions = src.assets.interface.Interface(
         service=service, s3_parameters=s3_parameters, arguments=arguments).exc()
-    logger.info(assets)
+    logger.info(partitions)
+
+    with pyspark.sql.SparkSession.builder.appName('Quantiles').getOrCreate() as spark:
+
+        src.algorithms.interface.Interface(spark=spark, partitions=partitions).exc()
 
     # Cache
     src.functions.cache.Cache().exc()
@@ -33,6 +37,7 @@ if __name__ == '__main__':
                         datefmt='%Y-%m-%d %H:%M:%S')
 
     # Modules
+    import src.algorithms.interface
     import src.assets.interface
     import src.elements.s3_parameters as s3p
     import src.elements.service as sr
