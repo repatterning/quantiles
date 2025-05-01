@@ -2,14 +2,17 @@
 FROM nvcr.io/nvidia/rapidsai/base:25.04-cuda12.8-py3.12
 
 
+USER root
+
+
 # If the steps of a `Dockerfile` use files that are different from the `context` file, COPY the
 # file of each step separately; and RUN the file immediately after COPY
 WORKDIR /app
-COPY /.devcontainer/requirements.txt /app
+COPY /.devcontainer/requirements.txt /.devcontainer/environment.yml /app/
 
 
 # Environment
-# SHELL [ "/bin/bash", "-c" ]
+SHELL [ "/bin/bash", "-c" ]
 
 
 # Installation
