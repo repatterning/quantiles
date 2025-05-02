@@ -47,7 +47,7 @@ class Persist:
         """
 
         :param metrics: A gauge's set of quantiles.  Each instance encodes a day's quantiles set.
-        :param partition: A few of a gauge's set of attributes.
+        :param partition: A few of a gauge's set of attributes.  Refer to src.elements.partitions
         :return:
         """
 
