@@ -9,6 +9,7 @@ import src.elements.s3_parameters as s3p
 import src.elements.service as sr
 import src.s3.prefix
 import src.algorithms.persist
+import src.algorithms.data
 
 
 class Interface:
@@ -25,20 +26,13 @@ class Interface:
         self.__s3_parameters = s3_parameters
         self.__arguments = arguments
 
-        # An instance for interacting with objects within an Amazon S3 prefix
-        self.__bucket_name = self.__s3_parameters._asdict()[arguments['s3']['p_bucket']]
-        self.__pre = src.s3.prefix.Prefix(
-            service=self.__service,
-            bucket_name=self.__bucket_name)
-
         # Quantile points
         self.__q_points = {0.10: 'l_whisker', 0.25: 'l_quartile', 0.50: 'median', 0.75: 'u_quartile', 0.90: 'u_whisker'}
 
-    @dask.delayed
     def __quantiles(self, data: cudf.DataFrame, quantile: float) -> cudf.DataFrame:
         """
 
-        :param blob:
+        :param data:
         :param quantile:
         :return:
         """
@@ -47,24 +41,7 @@ class Interface:
 
         return part.rename(columns={'measure': self.__q_points[quantile]})
 
-    def __get_data(self, partition: pr.Partitions) -> cudf.DataFrame:
-        """
-
-        :param partition:
-        :return:
-        """
-
-        listings = self.__pre.objects(prefix=partition.prefix.rstrip('/'))
-        keys = [f's3://{self.__bucket_name}/{listing}' for listing in listings]
-
-        blocks = [cudf.read_csv(filepath_or_buffer=key, header=0, usecols=['timestamp', 'ts_id', 'measure']) for key in keys]
-        block = cudf.concat(blocks)
-        block['datestr'] = cudf.to_datetime(block['timestamp'], unit='ms')
-        block['date'] = block['datestr'].dt.strftime('%Y-%m-%d')
-        block['date'] = cudf.to_datetime(block['date'])
-
-        return block[['date', 'measure']]
-
+    @dask.delayed
     def __get_metrics(self, data: cudf.DataFrame) -> cudf.DataFrame:
         """
 
@@ -72,11 +49,7 @@ class Interface:
         :return:
         """
 
-        computations = []
-        for quantile in self.__q_points.keys():
-            metrics = self.__quantiles(data=data, quantile=quantile)
-            computations.append(metrics)
-        sections = dask.compute(computations)[0]
+        sections = [self.__quantiles(data=data, quantile=quantile) for quantile in self.__q_points.keys()]
         instances = cudf.concat(sections, axis=1, ignore_index=False)
 
         return instances
@@ -87,10 +60,17 @@ class Interface:
         :return:
         """
 
-        persist = src.algorithms.persist.Persist()
+        # Delayed tasks
+        __data = dask.delayed(src.algorithms.data.Data(
+            service=self.__service, s3_parameters=self.__s3_parameters, arguments=self.__arguments).exc)
+        __persist = dask.delayed(src.algorithms.persist.Persist().exc)
 
-        for partition in partitions[:2]:
-            data = self.__get_data(partition=partition)
+        computations = []
+        for partition in partitions[:3]:
+            data = __data(partition=partition)
             metrics = self.__get_metrics(data=data)
-            persist.exc(metrics=metrics)
-            logging.info(metrics)
+            message = __persist(metrics=metrics)
+            computations.append(message)
+        messages = dask.compute(computations, scheduler='threads')[0]
+
+        logging.info(messages)
