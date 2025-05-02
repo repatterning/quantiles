@@ -3,12 +3,13 @@ import logging
 import cudf
 import cudf.core.groupby as ccg
 import numpy as np
+import pandas as pd
 
 import src.elements.partitions as pr
 import src.elements.s3_parameters as s3p
 import src.elements.service as sr
 import src.s3.prefix
-import dask.dataframe as ddf
+import dask
 
 
 class Interface:
@@ -31,11 +32,12 @@ class Interface:
             service=self.__service,
             bucket_name=self.__bucket_name)
 
-        # Logging
-        logging.basicConfig(level=logging.INFO,
-                            format='\n\n%(message)s\n%(asctime)s.%(msecs)03d\n',
-                            datefmt='%Y-%m-%d %H:%M:%S')
-        self.__logger = logging.getLogger(__name__)
+        self.__q = {0.25: 'l_quartile', 0.50: 'median'}
+
+    def __q_tiles(self, blob: pd.DataFrame, q: float):
+
+        part = blob.groupby(by='date', as_index=True, axis=0).quantile(q=q)
+        return part.rename(columns={'measure': self.__q[q]})
 
     def __experiment(self, partition: pr.Partitions):
         """
@@ -52,9 +54,14 @@ class Interface:
         block['datestr'] = cudf.to_datetime(block['timestamp'], unit='ms')
         block['date'] = block['datestr'].dt.strftime('%Y-%m-%d')
 
+        sc = dask.delayed(self.__q_tiles)
+
+        computations = []
         for q in [0.25, 0.50]:
-            metrics = block[['date', 'measure']].groupby(by='date', as_index=True, axis=0).quantile(q=q)
-            self.__logger.info(metrics)
+            metrics = sc(block[['date', 'measure']], q)
+            computations.append(metrics)
+        calc = dask.compute(computations)[0]
+        logging.info(calc)
 
 
     def exc(self, partitions: list[pr.Partitions]):
