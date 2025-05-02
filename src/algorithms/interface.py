@@ -1,15 +1,13 @@
 import logging
 
 import cudf
-import cudf.core.groupby as ccg
-import numpy as np
+import dask
 import pandas as pd
 
 import src.elements.partitions as pr
 import src.elements.s3_parameters as s3p
 import src.elements.service as sr
 import src.s3.prefix
-import dask
 
 
 class Interface:
@@ -32,12 +30,14 @@ class Interface:
             service=self.__service,
             bucket_name=self.__bucket_name)
 
-        self.__q = {0.25: 'l_quartile', 0.50: 'median'}
+        # Quantile points
+        self.__q_points = {0.10: 'l_whisker', 0.25: 'l_quartile', 0.50: 'median', 'u_quartile': 0.75, 'u_whisker': 0.90}
 
     def __q_tiles(self, blob: pd.DataFrame, q: float):
 
         part = blob.groupby(by='date', as_index=True, axis=0).quantile(q=q)
-        return part.rename(columns={'measure': self.__q[q]})
+        
+        return part.rename(columns={'measure': self.__q_points[q]})
 
     def __experiment(self, partition: pr.Partitions):
         """
