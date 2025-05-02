@@ -9,9 +9,9 @@ class Partitions(typing.NamedTuple):
     Attributes<br>
     ----------<br>
     <b>uri</b>: str<br>
-        A uniform resource locator
+        A uniform resource locator.<br><br>
     <b>prefix</b>: str<br>
-        A ... prefix
+        An Amazon S3 (Simple Storage Service) prefix.<br><br>
     <b>catchment_id</b>: int<br>
         The identification code of a catchment area.<br><br>
     <b>ts_id</b>: int<br>
