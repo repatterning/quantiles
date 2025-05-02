@@ -1,6 +1,7 @@
 """Module interface.py"""
 import logging
 import typing
+
 import pandas as pd
 
 import src.assets.gauges
@@ -17,16 +18,16 @@ class Interface:
     Notes<br>
     ------<br>
 
-    Reads-in the data in focus.
+    Reads-in the assets.
     """
 
     def __init__(self, service: sr.Service, s3_parameters: s3p.S3Parameters, arguments: dict):
         """
 
-        :param service:
-        :param s3_parameters: The overarching S3 parameters settings of this project, e.g., region code
-                              name, buckets, etc.
-        :param arguments:
+        :param service: A suite of services for interacting with Amazon Web Services.
+        :param s3_parameters: The overarching S3 parameters settings of this
+                              project, e.g., region code name, buckets, etc.
+        :param arguments: A set of arguments vis-à-vis calculation & storage objectives.
         """
 
         self.__service = service
@@ -37,7 +38,7 @@ class Interface:
     def __structure(partitions: pd.DataFrame) -> list[pr.Partitions]:
         """
 
-        :param partitions:
+        :param partitions: The time series partitions.
         :return:
         """
 
@@ -60,9 +61,11 @@ class Interface:
         # of excerpt ...
         partitions = src.assets.partitions.Partitions(data=gauges, arguments=self.__arguments).exc()
 
+        # The reference sheet of gauges.  Each instance encodes the attributes of a gauge.
         reference = src.assets.reference.Reference(
             s3_parameters=self.__s3_parameters).exc(ts_id=partitions['ts_id'].unique())
 
+        # Menu: For selecting a gauge's graph of quantiles via the gauge's time series identifier.
         src.assets.menu.Menu().exc(reference=reference)
 
         return self.__structure(partitions=partitions), reference
