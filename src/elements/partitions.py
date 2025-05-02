@@ -10,11 +10,14 @@ class Partitions(typing.NamedTuple):
     ----------<br>
     <b>uri</b>: str<br>
         A uniform resource locator
+    <b>prefix</b>: str<br>
+        A ... prefix
     <b>catchment_id</b>: int<br>
         The identification code of a catchment area.<br><br>
     <b>ts_id</b>: int<br>
         The identification code of a time series.<br><br>
     """
     uri: str
+    prefix: str
     catchment_id: int
     ts_id: int
