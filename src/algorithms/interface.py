@@ -31,15 +31,22 @@ class Interface:
             bucket_name=self.__bucket_name)
 
         # Quantile points
-        self.__q_points = {0.10: 'l_whisker', 0.25: 'l_quartile', 0.50: 'median', 'u_quartile': 0.75, 'u_whisker': 0.90}
+        self.__q_points = {0.10: 'l_whisker', 0.25: 'l_quartile', 0.50: 'median', 0.75: 'u_quartile', 0.90: 'u_whisker'}
 
-    def __q_tiles(self, blob: pd.DataFrame, q: float):
+    @dask.delayed
+    def __quantiles(self, data: cudf.DataFrame, quantile: float) -> cudf.DataFrame:
+        """
 
-        part = blob.groupby(by='date', as_index=True, axis=0).quantile(q=q)
-        
-        return part.rename(columns={'measure': self.__q_points[q]})
+        :param blob:
+        :param quantile:
+        :return:
+        """
 
-    def __experiment(self, partition: pr.Partitions):
+        part = data.groupby(by='date', as_index=True, axis=0).quantile(q=quantile)
+
+        return part.rename(columns={'measure': self.__q_points[quantile]})
+
+    def __get_data(self, partition: pr.Partitions) -> cudf.DataFrame:
         """
 
         :param partition:
@@ -54,17 +61,23 @@ class Interface:
         block['datestr'] = cudf.to_datetime(block['timestamp'], unit='ms')
         block['date'] = block['datestr'].dt.strftime('%Y-%m-%d')
 
-        sc = dask.delayed(self.__q_tiles)
+        return block[['date', 'measure']]
+
+    def __get_metrics(self, data: cudf.DataFrame) -> cudf.DataFrame:
+        """
+
+        :param data:
+        :return:
+        """
 
         computations = []
-        for q in [0.25, 0.50]:
-            metrics = sc(block[['date', 'measure']], q)
+        for quantile in self.__q_points.keys():
+            metrics = self.__quantiles(data=data, quantile=quantile)
             computations.append(metrics)
-        calc = dask.compute(computations)[0]
-        calculations = cudf.concat(calc, axis=1, ignore_index=False)
-        logging.info(calc)
-        logging.info(calculations)
+        sections = dask.compute(computations)[0]
+        instances = cudf.concat(sections, axis=1, ignore_index=False)
 
+        return instances
 
     def exc(self, partitions: list[pr.Partitions]):
         """
@@ -73,5 +86,6 @@ class Interface:
         """
 
         for partition in partitions[:2]:
-            logging.info(partition.uri)
-            self.__experiment(partition=partition)
+            data = self.__get_data(partition=partition)
+            metrics = self.__get_metrics(data=data)
+            logging.info(metrics)
