@@ -14,7 +14,7 @@ class Persist:
     def __init__(self, reference: pd.DataFrame):
         """
 
-        :param reference:
+        :param reference: A reference of gauges, and their attributes.
         """
 
         self.__reference = reference
@@ -26,8 +26,8 @@ class Persist:
     def __get_nodes(self, data: pd.DataFrame, ts_id: int) -> dict:
         """
 
-        :param data:
-        :param ts_id:
+        :param data: Quantiles
+        :param ts_id: A time series identification code
         :return:
         """
 
@@ -42,8 +42,8 @@ class Persist:
     def exc(self, metrics: cudf.DataFrame, partition: pr.Partitions) -> str:
         """
 
-        :param metrics:
-        :param partition:
+        :param metrics: A gauge's set of quantiles.  Each instance encodes a day's quantiles set.
+        :param partition: A few of a gauge's set of attributes.
         :return:
         """
 
