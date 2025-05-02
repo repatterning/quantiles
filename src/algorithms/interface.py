@@ -49,14 +49,6 @@ class Interface:
         instances = cudf.concat(parts)
         logging.info(instances)
 
-        # Or
-        frame = ddf.read_csv(
-            partition.uri + '*.csv',
-            dtype={'timestamp': 'float64', 'ts_id': 'float64', 'measure': 'float64'},
-            header=0, usecols=['timestamp', 'ts_id', 'measure'])
-        data = frame.compute()
-        logging.info(data)
-
     def exc(self, partitions: list[pr.Partitions]):
         """
 
