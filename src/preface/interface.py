@@ -47,7 +47,7 @@ class Interface:
         arguments: dict = self.__get_arguments(connector=connector)
 
         empty = src.preface.setup.Setup(
-            service=service, s3_parameters=s3_parameters).exc(reacquire=arguments['reacquire'])
+            service=service, s3_parameters=s3_parameters).exc()
 
         if empty:
             arguments['reacquire'] = True
