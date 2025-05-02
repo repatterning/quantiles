@@ -1,9 +1,12 @@
 import logging
+import os
 import cudf
 import json
 import pandas as pd
 
 import src.elements.partitions as pr
+import src.functions.objects
+import config
 
 
 class Persist:
@@ -16,7 +19,11 @@ class Persist:
 
         self.__reference = reference
 
-    def __get_dictionary(self, data: pd.DataFrame, ts_id: int):
+        self.__configurations = config.Config()
+        
+        self.__objects = src.functions.objects.Objects()
+
+    def __get_nodes(self, data: pd.DataFrame, ts_id: int) -> dict:
         """
 
         :param data:
@@ -27,9 +34,10 @@ class Persist:
         attributes: pd.Series = self.__reference.loc[self.__reference['ts_id'] == ts_id, :].squeeze()
 
         string = data.to_json(orient='split')
-        dictionary = json.loads(string)
-        dictionary.update(attributes.to_dict())
+        nodes = json.loads(string)
+        nodes.update(attributes.to_dict())
 
+        return nodes
 
     def exc(self, metrics: cudf.DataFrame, partition: pr.Partitions) -> str:
         """
@@ -45,7 +53,11 @@ class Persist:
         # Ascertain date order
         data.sort_values(by='date', ascending=True, ignore_index=True, inplace=True)
 
-        # The dictionary
-        self.__get_dictionary(data=data, ts_id=partition.ts_id)
+        # The nodes
+        nodes = self.__get_nodes(data=data, ts_id=partition.ts_id)
 
-        return 'in progress'
+        # Write
+        message = self.__objects.write(
+            nodes=nodes, path=os.path.join(self.__configurations.points_, f'{partition.ts_id}.json'))
+
+        return message
