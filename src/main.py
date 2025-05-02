@@ -3,20 +3,29 @@ import datetime
 import logging
 import os
 import sys
+
 import boto3
 
+
 def main():
+    """
+
+    :return:
+    """
 
     logger: logging.Logger = logging.getLogger(__name__)
     logger.info('Starting: %s', datetime.datetime.now().isoformat(timespec='microseconds'))
 
+    # The time series partitions, the reference sheet of gauges
     partitions, reference = src.assets.interface.Interface(
         service=service, s3_parameters=s3_parameters, arguments=arguments).exc()
     logger.info(reference)
 
+    # Calculating quantiles
     src.algorithms.interface.Interface(
         service=service, s3_parameters=s3_parameters, arguments=arguments).exc(partitions=partitions, reference=reference)
 
+    # Transferring calculations to an Amazon S3 (Simple Storage Service) bucket
     src.transfer.interface.Interface(
         connector=connector, service=service, s3_parameters=s3_parameters).exc()
 
