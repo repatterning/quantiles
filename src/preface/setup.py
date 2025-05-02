@@ -1,7 +1,7 @@
 """
 Module setup.py
 """
-import os
+import logging
 import sys
 
 import config
@@ -36,25 +36,7 @@ class Setup:
         self.__configurations = config.Config()
 
         # An instance for interacting with objects within an Amazon S3 prefix
-        self.__pre = src.s3.prefix.Prefix(service=self.__service, bucket_name=self.__s3_parameters.internal)
-
-        value = self.__configurations.quantiles_
-        self.__prefix = self.__s3_parameters.external + os.path.basename(os.path.basename(value)) + os.path.basename(value)
-
-    def __clear_prefix(self) -> bool:
-        """
-
-        :return:
-        """
-
-        # Get the keys therein
-        keys: list[str] = self.__pre.objects(prefix=self.__prefix)
-        if len(keys) > 0:
-            objects = [{'Key' : key} for key in keys]
-            state = self.__pre.delete(objects=objects)
-            return bool(state)
-
-        return True
+        self.__pre = src.s3.prefix.Prefix(service=self.__service, bucket_name=self.__s3_parameters.external)
 
     def __s3(self) -> bool:
         """
@@ -65,10 +47,10 @@ class Setup:
 
         # An instance for interacting with Amazon S3 buckets.
         bucket = src.s3.bucket.Bucket(service=self.__service, location_constraint=self.__s3_parameters.location_constraint,
-                                      bucket_name=self.__s3_parameters.internal)
+                                      bucket_name=self.__s3_parameters.external)
 
         if bucket.exists():
-            return self.__clear_prefix()
+            return True
 
         return bucket.create()
 
@@ -86,17 +68,17 @@ class Setup:
 
         return all(states)
 
-    def exc(self, reacquire: bool) -> bool:
+    def exc(self) -> bool:
         """
 
         :return:
         """
 
-        if reacquire:
-            self.__s3()
+        if self.__s3() & self.__local():
 
-        if self.__local():
-            listings = self.__pre.objects(prefix=self.__prefix)
+            listings = self.__pre.objects(prefix=self.__configurations.prefix)
+            logging.info(listings)
+
             keys = sum(listings, [])
             return len(keys) == 0
 
