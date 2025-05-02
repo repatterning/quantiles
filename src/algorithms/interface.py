@@ -14,11 +14,16 @@ class Interface:
         self.__spark = spark
         self.__partitions = partitions
 
-    def __experiment(self, partition: pr.Partitions):
+    def __experiment(self, partition: pr.Partitions) -> int:
+        """
+
+        :param partition:
+        :return:
+        """
 
         frame = (self.__spark.read.format('csv')
-         .option('header', 'true')
-         .option('encoding', 'UTF-8').load(path=partition.uri))
+                 .option('header', 'true')
+                 .option('encoding', 'UTF-8').load(path=partition.uri + '*'))
         frame.persist(storageLevel=pyspark.StorageLevel.MEMORY_ONLY)
 
         logging.info(frame.rdd.getNumPartitions())
@@ -32,9 +37,17 @@ class Interface:
 
         data.show()
 
+        return data.rdd.getNumPartitions()
+
 
     def exc(self):
+        """
 
-        map(self.__experiment, self.__partitions[:4])
+        :return:
+        """
 
+        for partition in self.__partitions[:4]:
 
+            logging.info(partition)
+
+            self.__experiment(partition=partition)
