@@ -1,4 +1,5 @@
 """Module gauges.py"""
+import logging
 import numpy as np
 import pandas as pd
 
@@ -30,7 +31,7 @@ class Gauges:
             bucket_name=self.__s3_parameters._asdict()[arguments['s3']['p_bucket']])
 
     @staticmethod
-    def __get_elements(objects: list[str]) -> pd.DataFrame:
+    def __get_elements(objects: list[str], prefixes: list[str]) -> pd.DataFrame:
         """
 
         :param objects:
@@ -39,7 +40,7 @@ class Gauges:
 
         # A set of S3 uniform resource locators
         strings = [i.rsplit('/', 1)[0] for i in objects]
-        values = pd.DataFrame(data={'uri': objects, 'string': strings})
+        values = pd.DataFrame(data={'uri': objects, 'prefix': prefixes, 'string': strings})
 
         # Splitting locators
         rename = {0: 'endpoint', 1: 'catchment_id', 2: 'ts_id'}
@@ -51,7 +52,7 @@ class Gauges:
 
         return values
 
-    def __get_keys(self) -> list[str]:
+    def __get_prefixes(self) -> list[str]:
         """
 
         :return:
@@ -61,14 +62,16 @@ class Gauges:
             prefix=(self.__s3_parameters._asdict()[self.__arguments['s3']['p_prefix']]
                     + f"{self.__arguments['s3']['affix']}/"),
             delimiter='/')
+        logging.info(paths)
 
         computations = []
         for path in paths:
             listings = self.__pre.objects(prefix=path, delimiter='/')
             computations.append(listings)
-        keys: list[str] = sum(computations, [])
+        prefixes: list[str] = sum(computations, [])
+        logging.info(prefixes)
 
-        return keys
+        return prefixes
 
     def exc(self) -> pd.DataFrame:
         """
@@ -76,15 +79,15 @@ class Gauges:
         :return:
         """
 
-        keys = self.__get_keys()
-        if len(keys) > 0:
-            objects = [f's3a://{self.__s3_parameters.internal}/{key}' for key in keys]
+        prefixes = self.__get_prefixes()
+        if len(prefixes) > 0:
+            objects = [f's3://{self.__s3_parameters.internal}/{prefix}' for prefix in prefixes]
         else:
             return pd.DataFrame()
 
         # The variable objects is a list of uniform resource locators.  Each locator includes a 'ts_id',
         # 'catchment_id', 'datestr' substring; the function __get_elements extracts these items.
-        values = self.__get_elements(objects=objects)
+        values = self.__get_elements(objects=objects, prefixes=prefixes)
 
         # Types
         values['catchment_id'] = values['catchment_id'].astype(dtype=np.int64)
