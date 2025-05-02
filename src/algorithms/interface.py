@@ -13,13 +13,17 @@ import src.algorithms.data
 
 
 class Interface:
+    """
+    The interface to quantiles calculations.
+    """
 
     def __init__(self, service: sr.Service, s3_parameters: s3p.S3Parameters, arguments: dict):
         """
 
-        :param service:
-        :param s3_parameters:
-        :param arguments:
+        :param service: A suite of services for interacting with Amazon Web Services.
+        :param s3_parameters: The overarching S3 parameters settings of this
+                              project, e.g., region code name, buckets, etc.
+        :param arguments: A set of arguments vis-à-vis calculation & storage objectives.
         """
 
         self.__service = service
@@ -32,8 +36,8 @@ class Interface:
     def __quantiles(self, data: cudf.DataFrame, quantile: float) -> cudf.DataFrame:
         """
 
-        :param data:
-        :param quantile:
+        :param data: A data frame consisting of fields ['date', 'measure'] <b>only</b>.<br>
+        :param quantile: A quantile point; 0 &le; quantile point &le; 1.<br>
         :return:
         """
 
@@ -45,7 +49,7 @@ class Interface:
     def __get_metrics(self, data: cudf.DataFrame) -> cudf.DataFrame:
         """
 
-        :param data:
+        :param data: A data frame consisting of fields ['date', 'measure'] <b>only</b>.<br>
         :return:
         """
 
@@ -57,8 +61,8 @@ class Interface:
     def exc(self, partitions: list[pr.Partitions], reference: pd.DataFrame):
         """
 
-        :param partitions:
-        :param reference:
+        :param partitions: The time series partitions.
+        :param reference: The reference sheet of gauges.  Each instance encodes the attributes of a gauge.
         :return:
         """
 
