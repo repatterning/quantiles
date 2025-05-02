@@ -38,8 +38,8 @@ class Setup:
         # An instance for interacting with objects within an Amazon S3 prefix
         self.__pre = src.s3.prefix.Prefix(service=self.__service, bucket_name=self.__s3_parameters.internal)
 
-        self.__prefixes = [self.__s3_parameters.external + os.path.basename(os.path.basename(value)) + os.path.basename(value)
-                           for value in [self.__configurations.quantiles_] ]
+        value = self.__configurations.quantiles_
+        self.__prefix = self.__s3_parameters.external + os.path.basename(os.path.basename(value)) + os.path.basename(value)
 
     def __clear_prefix(self) -> bool:
         """
@@ -48,17 +48,13 @@ class Setup:
         """
 
         # Get the keys therein
-        states = []
-        for prefix in self.__prefixes:
-            keys: list[str] = self.__pre.objects(prefix=prefix)
-            if len(keys) > 0:
-                objects = [{'Key' : key} for key in keys]
-                state = self.__pre.delete(objects=objects)
-                states.append(bool(state))
-            else:
-                states.append(True)
+        keys: list[str] = self.__pre.objects(prefix=self.__prefix)
+        if len(keys) > 0:
+            objects = [{'Key' : key} for key in keys]
+            state = self.__pre.delete(objects=objects)
+            return bool(state)
 
-        return all(states)
+        return True
 
     def __s3(self) -> bool:
         """
@@ -86,8 +82,9 @@ class Setup:
         directories = src.functions.directories.Directories()
         directories.cleanup(path=self.__configurations.warehouse)
 
-        # The warehouse
-        return directories.create(path=self.__configurations.warehouse)
+        states = [directories.create(p) for p in [self.__configurations.menu_, self.__configurations.points_]]
+
+        return all(states)
 
     def exc(self, reacquire: bool) -> bool:
         """
@@ -99,7 +96,7 @@ class Setup:
             self.__s3()
 
         if self.__local():
-            listings = [self.__pre.objects(prefix=prefix) for prefix in self.__prefixes]
+            listings = self.__pre.objects(prefix=self.__prefix)
             keys = sum(listings, [])
             return len(keys) == 0
 
