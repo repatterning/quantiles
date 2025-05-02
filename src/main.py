@@ -17,6 +17,9 @@ def main():
     src.algorithms.interface.Interface(
         service=service, s3_parameters=s3_parameters, arguments=arguments).exc(partitions=partitions, reference=reference)
 
+    src.transfer.interface.Interface(
+        connector=connector, service=service, s3_parameters=s3_parameters).exc()
+
     # Cache
     src.functions.cache.Cache().exc()
 
@@ -39,6 +42,7 @@ if __name__ == '__main__':
     import src.elements.service as sr
     import src.functions.cache
     import src.preface.interface
+    import src.transfer.interface
 
     connector: boto3.session.Session
     s3_parameters: s3p.S3Parameters
