@@ -1,6 +1,8 @@
 import logging
 
 import cudf
+import cudf.core.groupby as ccg
+import numpy as np
 
 import src.elements.partitions as pr
 import src.elements.s3_parameters as s3p
@@ -45,12 +47,15 @@ class Interface:
         listings = self.__pre.objects(prefix=partition.prefix.rstrip('/'))
         keys = [f's3://{self.__bucket_name}/{listing}' for listing in listings]
 
-        for key in keys:
+        blocks = [cudf.read_csv(filepath_or_buffer=key, header=0, usecols=['timestamp', 'ts_id', 'measure']) for key in keys]
+        block = cudf.concat(blocks)
+        block['datestr'] = cudf.to_datetime(block['timestamp'], unit='ms')
+        block['date'] = block['datestr'].dt.strftime('%Y-%m-%d')
 
-            part = cudf.read_csv(filepath_or_buffer=key, header=0, usecols=['timestamp', 'ts_id', 'measure'])
-            part['datestr'] = cudf.to_datetime(part['timestamp'], unit='ms')
-            part['date'] = part['datestr'].dt.strftime('%Y-%m-%d')
-            logging.info(part.head())
+        for q in [0.25, 0.50]:
+            metrics = block[['date', 'measure']].groupby(by='date', as_index=True, axis=0).quantile(q=q)
+            self.__logger.info(metrics)
+
 
     def exc(self, partitions: list[pr.Partitions]):
         """
