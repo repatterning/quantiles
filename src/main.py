@@ -17,9 +17,14 @@ def main():
         service=service, s3_parameters=s3_parameters, arguments=arguments).exc()
     logger.info(partitions)
 
-    with pyspark.sql.SparkSession.builder.appName('Quantiles').getOrCreate() as spark:
 
-        src.algorithms.interface.Interface(spark=spark, partitions=partitions).exc()
+    spark = (pyspark.sql.SparkSession.builder.appName('Quantiles')
+             .config('spark.jars.packages', 'org.apache.hadoop:hadoop-aws:3.4.1,org.apache.hadoop:hadoop-client:3.4.1')
+             .config('spark.jars.excludes', 'com.google.guava:guava')
+             .config('spark.hadoop.fs.s3a.aws.credentials.provider', 'com.amazonaws.auth.profile.ProfileCredentialsProvider')
+             .getOrCreate())
+
+    src.algorithms.interface.Interface(spark=spark, partitions=partitions).exc()
 
     # Cache
     src.functions.cache.Cache().exc()
@@ -30,6 +35,9 @@ if __name__ == '__main__':
     root = os.getcwd()
     sys.path.append(root)
     sys.path.append(os.path.join(root, 'src'))
+
+    os.environ['PYSPARK_PYTHON'] = sys.executable
+    os.environ['PYSPARK_DRIVER_PYTHON'] = sys.executable
 
     # Logging
     logging.basicConfig(level=logging.INFO,
