@@ -1,53 +1,68 @@
 import logging
 
-import pyspark.sql
-import pyspark.sql.functions as pf
-import pyspark.sql.types as pt
-import pyspark.storagelevel
+import cudf
 
 import src.elements.partitions as pr
+import src.elements.s3_parameters as s3p
+import src.elements.service as sr
+import src.s3.prefix
+import dask.dataframe as ddf
+
 
 class Interface:
 
-    def __init__(self, spark: pyspark.sql.SparkSession, partitions: list[pr.Partitions] ):
+    def __init__(self, service: sr.Service, s3_parameters: s3p.S3Parameters, arguments: dict):
+        """
 
-        self.__spark = spark
-        self.__partitions = partitions
+        :param service:
+        :param s3_parameters:
+        :param arguments:
+        """
 
-    def __experiment(self, partition: pr.Partitions) -> int:
+        self.__service = service
+        self.__s3_parameters = s3_parameters
+        self.__arguments = arguments
+
+        # An instance for interacting with objects within an Amazon S3 prefix
+        self.__bucket_name = self.__s3_parameters._asdict()[arguments['s3']['p_bucket']]
+        self.__pre = src.s3.prefix.Prefix(
+            service=self.__service,
+            bucket_name=self.__bucket_name)
+
+        # Logging
+        logging.basicConfig(level=logging.INFO,
+                            format='\n\n%(message)s\n%(asctime)s.%(msecs)03d\n',
+                            datefmt='%Y-%m-%d %H:%M:%S')
+        self.__logger = logging.getLogger(__name__)
+
+    def __experiment(self, partition: pr.Partitions):
         """
 
         :param partition:
         :return:
         """
 
-        frame = (self.__spark.read.format('csv')
-                 .option('header', 'true')
-                 .option('encoding', 'UTF-8').load(path=partition.uri + '*'))
-        frame.persist(storageLevel=pyspark.StorageLevel.MEMORY_ONLY)
+        listings = self.__pre.objects(prefix=partition.prefix.rstrip('/'))
+        keys = [f's3://{self.__bucket_name}/{listing}' for listing in listings]
 
-        logging.info(frame.rdd.getNumPartitions())
+        parts = [cudf.read_csv(filepath_or_buffer=key, header=0, usecols=['timestamp', 'ts_id', 'measure']) for key in keys]
+        instances = cudf.concat(parts)
+        logging.info(instances)
 
-        frame.show()
+        # Or
+        frame = ddf.read_csv(
+            partition.uri + '*.csv',
+            dtype={'timestamp': 'float64', 'ts_id': 'float64', 'measure': 'float64'},
+            header=0, usecols=['timestamp', 'ts_id', 'measure'])
+        data = frame.compute()
+        logging.info(data)
 
-        data = frame.withColumn(
-            'date', pf.to_date(frame['timestamp'].cast(dataType=pt.TimestampType())))
-
-        logging.info(data.rdd.getNumPartitions())
-
-        data.show()
-
-        return data.rdd.getNumPartitions()
-
-
-    def exc(self):
+    def exc(self, partitions: list[pr.Partitions]):
         """
 
         :return:
         """
 
-        for partition in self.__partitions[:4]:
-
-            logging.info(partition)
-
+        for partition in partitions[:2]:
+            logging.info(partition.uri)
             self.__experiment(partition=partition)
