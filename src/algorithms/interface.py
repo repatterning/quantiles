@@ -45,9 +45,12 @@ class Interface:
         listings = self.__pre.objects(prefix=partition.prefix.rstrip('/'))
         keys = [f's3://{self.__bucket_name}/{listing}' for listing in listings]
 
-        parts = [cudf.read_csv(filepath_or_buffer=key, header=0, usecols=['timestamp', 'ts_id', 'measure']) for key in keys]
-        instances = cudf.concat(parts)
-        logging.info(instances)
+        for key in keys:
+
+            part = cudf.read_csv(filepath_or_buffer=key, header=0, usecols=['timestamp', 'ts_id', 'measure'])
+            part['datestr'] = cudf.to_datetime(part['timestamp'], unit='ms')
+            part['date'] = part['datestr'].dt.strftime('%Y-%m-%d')
+            logging.info(part.head())
 
     def exc(self, partitions: list[pr.Partitions]):
         """
