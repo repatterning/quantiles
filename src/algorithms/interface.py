@@ -61,7 +61,9 @@ class Interface:
             metrics = sc(block[['date', 'measure']], q)
             computations.append(metrics)
         calc = dask.compute(computations)[0]
+        calculations = cudf.concat(calc, axis=1, ignore_index=False)
         logging.info(calc)
+        logging.info(calculations)
 
 
     def exc(self, partitions: list[pr.Partitions]):
