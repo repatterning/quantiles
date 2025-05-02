@@ -1,9 +1,12 @@
 """Module interface.py"""
 import logging
+import typing
 import pandas as pd
 
 import src.assets.gauges
+import src.assets.menu
 import src.assets.partitions
+import src.assets.reference
 import src.elements.partitions as pr
 import src.elements.s3_parameters as s3p
 import src.elements.service as sr
@@ -42,7 +45,7 @@ class Interface:
 
         return [pr.Partitions(**value) for value in values]
 
-    def exc(self) -> list[pr.Partitions]:
+    def exc(self) -> typing.Tuple[list[pr.Partitions], pd.DataFrame]:
         """
 
         :return:
@@ -57,4 +60,9 @@ class Interface:
         # of excerpt ...
         partitions = src.assets.partitions.Partitions(data=gauges, arguments=self.__arguments).exc()
 
-        return self.__structure(partitions=partitions)
+        reference = src.assets.reference.Reference(
+            s3_parameters=self.__s3_parameters).exc(ts_id=partitions['ts_id'].unique())
+
+        src.assets.menu.Menu().exc(reference=reference)
+
+        return self.__structure(partitions=partitions), reference
