@@ -78,7 +78,7 @@ class Gauges:
 
         keys = self.__get_keys()
         if len(keys) > 0:
-            objects = [f's3://{self.__s3_parameters.internal}/{key}' for key in keys]
+            objects = [f's3a://{self.__s3_parameters.internal}/{key}' for key in keys]
         else:
             return pd.DataFrame()
 
