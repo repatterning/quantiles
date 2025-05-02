@@ -12,10 +12,10 @@ def main():
 
     partitions, reference = src.assets.interface.Interface(
         service=service, s3_parameters=s3_parameters, arguments=arguments).exc()
-    logger.info(partitions)
+    logger.info(reference)
 
     src.algorithms.interface.Interface(
-        service=service, s3_parameters=s3_parameters, arguments=arguments).exc(partitions=partitions)
+        service=service, s3_parameters=s3_parameters, arguments=arguments).exc(partitions=partitions, reference=reference)
 
     # Cache
     src.functions.cache.Cache().exc()
