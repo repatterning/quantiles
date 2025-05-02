@@ -1,19 +1,24 @@
-
+"""Module data.py"""
 import cudf
 
+import src.elements.partitions as pr
 import src.elements.s3_parameters as s3p
 import src.elements.service as sr
-import src.elements.partitions as pr
 import src.s3.prefix
 
+
 class Data:
+    """
+    Data
+    """
 
     def __init__(self, service: sr.Service, s3_parameters: s3p.S3Parameters, arguments: dict):
         """
 
-        :param service:
-        :param s3_parameters:
-        :param arguments:
+        :param service: A suite of services for interacting with Amazon Web Services.
+        :param s3_parameters: The overarching S3 parameters settings of this
+                              project, e.g., region code name, buckets, etc.
+        :param arguments: A set of arguments vis-à-vis calculation & storage objectives.
         """
 
         self.__service = service
@@ -29,7 +34,7 @@ class Data:
     def exc(self, partition: pr.Partitions) -> cudf.DataFrame:
         """
 
-        :param partition:
+        :param partition: Refer to src.elements.partitions
         :return:
         """
 
