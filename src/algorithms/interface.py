@@ -8,6 +8,7 @@ import src.elements.partitions as pr
 import src.elements.s3_parameters as s3p
 import src.elements.service as sr
 import src.s3.prefix
+import src.algorithms.persist
 
 
 class Interface:
@@ -60,6 +61,7 @@ class Interface:
         block = cudf.concat(blocks)
         block['datestr'] = cudf.to_datetime(block['timestamp'], unit='ms')
         block['date'] = block['datestr'].dt.strftime('%Y-%m-%d')
+        block['date'] = cudf.to_datetime(block['date'])
 
         return block[['date', 'measure']]
 
@@ -85,7 +87,10 @@ class Interface:
         :return:
         """
 
+        persist = src.algorithms.persist.Persist()
+
         for partition in partitions[:2]:
             data = self.__get_data(partition=partition)
             metrics = self.__get_metrics(data=data)
+            persist.exc(metrics=metrics)
             logging.info(metrics)
