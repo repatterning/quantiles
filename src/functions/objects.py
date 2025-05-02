@@ -23,7 +23,7 @@ class Objects:
         """
 
     @staticmethod
-    def write(nodes: dict, path: str) -> str:
+    def write(nodes: dict | list[dict], path: str) -> str:
         """
 
         :param nodes: A dictionary of data
