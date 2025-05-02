@@ -1,5 +1,4 @@
 """Module gauges.py"""
-import logging
 import numpy as np
 import pandas as pd
 
@@ -62,14 +61,12 @@ class Gauges:
             prefix=(self.__s3_parameters._asdict()[self.__arguments['s3']['p_prefix']]
                     + f"{self.__arguments['s3']['affix']}/"),
             delimiter='/')
-        logging.info(paths)
 
         computations = []
         for path in paths:
             listings = self.__pre.objects(prefix=path, delimiter='/')
             computations.append(listings)
         prefixes: list[str] = sum(computations, [])
-        logging.info(prefixes)
 
         return prefixes
 
