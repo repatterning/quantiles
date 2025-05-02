@@ -54,22 +54,24 @@ class Interface:
 
         return instances
 
-    def exc(self, partitions: list[pr.Partitions]):
+    def exc(self, partitions: list[pr.Partitions], reference: pd.DataFrame):
         """
 
+        :param partitions:
+        :param reference:
         :return:
         """
 
         # Delayed tasks
         __data = dask.delayed(src.algorithms.data.Data(
             service=self.__service, s3_parameters=self.__s3_parameters, arguments=self.__arguments).exc)
-        __persist = dask.delayed(src.algorithms.persist.Persist().exc)
+        __persist = dask.delayed(src.algorithms.persist.Persist(reference=reference).exc)
 
         computations = []
         for partition in partitions[:3]:
             data = __data(partition=partition)
             metrics = self.__get_metrics(data=data)
-            message = __persist(metrics=metrics)
+            message = __persist(metrics=metrics, partition=partition)
             computations.append(message)
         messages = dask.compute(computations, scheduler='threads')[0]
 
