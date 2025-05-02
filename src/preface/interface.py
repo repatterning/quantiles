@@ -27,7 +27,7 @@ class Interface:
         :return:
         """
 
-        key_name = 'external/quantiles/arguments.json'
+        key_name = 'quantiles/arguments.json'
 
         arguments =  src.s3.configurations.Configurations(connector=connector).objects(key_name=key_name)
         logging.info(arguments)
