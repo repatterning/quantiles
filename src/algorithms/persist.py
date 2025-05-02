@@ -1,15 +1,19 @@
-import logging
-import os
-import cudf
+"""Module persist.py"""
 import json
+import os
+
+import cudf
 import pandas as pd
 
+import config
 import src.elements.partitions as pr
 import src.functions.objects
-import config
 
 
 class Persist:
+    """
+    Persist
+    """
 
     def __init__(self, reference: pd.DataFrame):
         """
