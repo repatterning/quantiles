@@ -62,7 +62,6 @@ class Interface:
         strings = self.__dictionary.exc(
             path=os.path.join(os.getcwd(), 'warehouse', 'quantiles'),
             extension='json', prefix=self.__configurations.prefix + '/')
-        logging.info(strings)
 
         # Adding metadata details per instance
         strings = self.__get_metadata(frame=strings.copy())
