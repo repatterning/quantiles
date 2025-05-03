@@ -1,9 +1,7 @@
 """Module partitions.py"""
-import datetime
-import typing
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 
 
 class Partitions:
