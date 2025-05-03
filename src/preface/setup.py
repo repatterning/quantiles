@@ -79,7 +79,6 @@ class Setup:
             listings = self.__pre.objects(prefix=self.__configurations.prefix)
             logging.info(listings)
 
-            keys = sum(listings, [])
-            return len(keys) == 0
+            return len(listings) > 1
 
         sys.exit('Error: Set up failure.')
