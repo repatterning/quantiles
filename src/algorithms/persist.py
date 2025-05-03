@@ -43,13 +43,17 @@ class Persist:
 
         return nodes
 
-    def exc(self, metrics: cudf.DataFrame, partition: pr.Partitions) -> str:
+    def exc(self, quantiles: cudf.DataFrame, extrema: cudf.DataFrame, partition: pr.Partitions) -> str:
         """
 
-        :param metrics: A gauge's set of quantiles.  Each instance encodes a day's quantiles set.
+        :param quantiles: A gauge's set of quantiles.  Each instance encodes a day's quantiles set.
+        :param extrema:
         :param partition: A few of a gauge's set of attributes.  Refer to src.elements.partitions
         :return:
         """
+
+        metrics = quantiles.join(extrema)
+        
 
         # To pandas DataFrame format
         data = metrics.to_pandas().reset_index(drop=False)
