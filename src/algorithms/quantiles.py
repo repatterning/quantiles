@@ -1,5 +1,4 @@
-import logging
-
+"""Module quantiles.py"""
 import cudf
 
 class Quantiles:
@@ -9,7 +8,7 @@ class Quantiles:
 
     def __init__(self):
         """
-
+        Constructor
         """
 
         # Quantile points
@@ -36,7 +35,5 @@ class Quantiles:
 
         sections = [self.__quantiles(data=data, quantile=quantile) for quantile, _ in self.__q_points.items()]
         instances = cudf.concat(sections, axis=1, ignore_index=False)
-
-        logging.info(instances.head())
 
         return instances
