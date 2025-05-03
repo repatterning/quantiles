@@ -53,7 +53,7 @@ class Persist:
         """
 
         metrics = quantiles.join(extrema)
-        
+
 
         # To pandas DataFrame format
         data = metrics.to_pandas().reset_index(drop=False)
