@@ -54,7 +54,7 @@ class Interface:
         :return:
         """
 
-        sections = [self.__quantiles(data=data, quantile=quantile) for quantile in self.__q_points.keys()]
+        sections = [self.__quantiles(data=data, quantile=quantile) for quantile, _ in self.__q_points.items()]
         instances = cudf.concat(sections, axis=1, ignore_index=False)
 
         return instances
