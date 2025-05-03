@@ -26,11 +26,22 @@ RUN apt update && apt -q -y upgrade && apt -y install sudo && sudo apt -y instal
     curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "/tmp/awscliv2.zip" && \
     unzip /tmp/awscliv2.zip -d /tmp/ && cd /tmp && sudo ./aws/install && cd ~ && \
     pip install --upgrade pip && \
-    pip install $(grep -ivE "cudf|dask\[complete\]" /app/requirements.txt) --no-cache-dir
+    pip install $(grep -ivE "cudf|dask\[complete\]" /app/requirements.txt) --no-cache-dir && \
+    mkdir /app/warehouse && \
+    chown -R rapids /app/warehouse
+
+
+# Specific COPY
+COPY src /app/src
+COPY config.py /app/config.py
 
 
 # Port
 EXPOSE 8000
+
+
+# Create mount point
+VOLUME [ "/app/warehouse" ]
 
 
 # User
