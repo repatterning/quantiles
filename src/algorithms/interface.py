@@ -73,7 +73,7 @@ class Interface:
         __persist = dask.delayed(src.algorithms.persist.Persist(reference=reference).exc)
 
         computations = []
-        for partition in partitions[:3]:
+        for partition in partitions[:4]:
             data = __data(partition=partition)
             metrics = self.__get_metrics(data=data)
             message = __persist(metrics=metrics, partition=partition)
