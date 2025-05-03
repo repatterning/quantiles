@@ -68,7 +68,6 @@ class Interface:
         strings = self.__get_metadata(frame=strings.copy())
         logging.info(strings)
 
-        '''
         # Prepare the S3 (Simple Storage Service) section
         src.transfer.cloud.Cloud(
             service=self.__service, s3_parameters=self.__s3_parameters).exc()
@@ -78,4 +77,3 @@ class Interface:
             service=self.__service, bucket_name=self.__s3_parameters.external).exc(
             strings=strings, tagging='project=hydrography')
         logging.info(messages)
-        '''
