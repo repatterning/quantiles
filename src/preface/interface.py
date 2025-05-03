@@ -54,4 +54,3 @@ class Interface:
             logging.info(arguments)
 
         return connector, s3_parameters, service, arguments
-    
