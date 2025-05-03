@@ -24,7 +24,7 @@ class Persist:
         self.__reference = reference
 
         self.__configurations = config.Config()
-        
+
         self.__objects = src.functions.objects.Objects()
 
     def __get_nodes(self, data: pd.DataFrame, ts_id: int) -> dict:
