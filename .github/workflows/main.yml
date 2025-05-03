@@ -9,6 +9,7 @@ jobs:
   build:
     name: Code Analysis
     runs-on: ubuntu-latest
+    container: nvcr.io/nvidia/rapidsai/base:25.04-cuda12.8-py3.12
 
     strategy:
       max-parallel: 4
