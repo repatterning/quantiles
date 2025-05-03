@@ -1,5 +1,4 @@
 """Module interface.py"""
-import logging
 import typing
 
 import pandas as pd
@@ -55,7 +54,6 @@ class Interface:
         # Applicable time series metadata, i.e., gauge, identification codes
         gauges = src.assets.gauges.Gauges(
             service=self.__service, s3_parameters=self.__s3_parameters, arguments=self.__arguments).exc()
-        logging.info(gauges)
 
         # Strings for data reading.  If self.__arguments.get('reacquire') is False, the partitions will be those
         # of excerpt ...
