@@ -32,7 +32,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          if [ -f ${{ github.workspace }}/.devcontainer/requirements.txt ]; then pip install $(grep -ivE "cudf|dask" ${{ github.workspace }}/.devcontainer/requirements.txt) --no-cache-dir; fi
+          if [ -f ${{ github.workspace }}/.devcontainer/requirements.txt ]; then pip install -r ${{ github.workspace }}/.devcontainer/requirements.txt; fi
 
       - name: Lint with flake8
         run: |
