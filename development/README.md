@@ -168,20 +168,17 @@ python -m flake8 --count --exit-zero --max-complexity=10 --max-line-length=127 -
 
 inspects complexity.
 
-<br>
-<br>
 
 <br>
 <br>
 
-<br>
-<br>
+## S3
 
-<br>
-<br>
+Retrieve the metadata of an Amazon S3 (Simple Storage Service) object, i.e., file, via the directive
 
-
-
+```shell
+aws s3api head-object --bucket {bucket.name} --key {key.string}
+```
 
 <br>
 <br>
