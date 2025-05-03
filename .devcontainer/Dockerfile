@@ -12,7 +12,7 @@ ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
 # If the steps of a `Dockerfile` use files that are different from the `context` file, COPY the
 # file of each step separately; and RUN the file immediately after COPY
 WORKDIR /app
-COPY /.devcontainer/requirements.txt /.devcontainer/environment.yml /app/
+COPY /.devcontainer/requirements.txt /app
 
 
 # Environment
