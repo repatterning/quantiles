@@ -48,7 +48,7 @@ class Interface:
         __persist = dask.delayed(src.algorithms.persist.Persist(reference=reference).exc)
 
         computations = []
-        for partition in partitions[:4]:
+        for partition in partitions:
             data = __data(partition=partition)
             quantiles = __quantiles(data=data)
             extrema = __extrema(data=data)
