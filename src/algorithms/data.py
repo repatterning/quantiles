@@ -26,7 +26,7 @@ class Data:
         self.__arguments = arguments
 
         # An instance for interacting with objects within an Amazon S3 prefix
-        self.__bucket_name = self.__s3_parameters._asdict()[arguments['s3']['p_bucket']]
+        self.__bucket_name = self.__s3_parameters._asdict()[self.__arguments['s3']['p_bucket']]
         self.__pre = src.s3.prefix.Prefix(
             service=self.__service,
             bucket_name=self.__bucket_name)
