@@ -1,5 +1,4 @@
-import logging
-
+"""Module extrema.py"""
 import cudf
 
 
@@ -10,20 +9,19 @@ class Extrema:
 
     def __init__(self):
         """
-
+        Constructor
         """
 
         self.__metrics = ['minimum', 'maximum']
 
-    def __extrema(self, data: cudf.DataFrame, calculate: str) -> cudf.DataFrame:
+    @staticmethod
+    def __extrema(data: cudf.DataFrame, calculate: str) -> cudf.DataFrame:
         """
 
         :param data:
         :param calculate:
         :return:
         """
-
-        logging.info(calculate)
 
         match calculate:
             case 'maximum':
@@ -44,7 +42,5 @@ class Extrema:
 
         sections = [self.__extrema(data=data, calculate=metric) for metric in self.__metrics]
         instances = cudf.concat(sections, axis=1, ignore_index=False)
-
-        logging.info(instances.head())
 
         return instances
