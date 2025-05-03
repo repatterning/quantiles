@@ -1,12 +1,13 @@
 """Module interface.py"""
 import logging
 
-import cudf
 import dask
 import pandas as pd
 
 import src.algorithms.data
+import src.algorithms.extrema
 import src.algorithms.persist
+import src.algorithms.quantiles
 import src.elements.partitions as pr
 import src.elements.s3_parameters as s3p
 import src.elements.service as sr
@@ -31,34 +32,6 @@ class Interface:
         self.__s3_parameters = s3_parameters
         self.__arguments = arguments
 
-        # Quantile points
-        self.__q_points = {0.10: 'l_whisker', 0.25: 'l_quartile', 0.50: 'median', 0.75: 'u_quartile', 0.90: 'u_whisker'}
-
-    def __quantiles(self, data: cudf.DataFrame, quantile: float) -> cudf.DataFrame:
-        """
-
-        :param data: A data frame consisting of fields ['date', 'measure'] <b>only</b>.<br>
-        :param quantile: A quantile point; 0 &le; quantile point &le; 1.<br>
-        :return:
-        """
-
-        part = data.groupby(by='date', as_index=True, axis=0).quantile(q=quantile)
-
-        return part.rename(columns={'measure': self.__q_points[quantile]})
-
-    @dask.delayed
-    def __get_metrics(self, data: cudf.DataFrame) -> cudf.DataFrame:
-        """
-
-        :param data: A data frame consisting of fields ['date', 'measure'] <b>only</b>.<br>
-        :return:
-        """
-
-        sections = [self.__quantiles(data=data, quantile=quantile) for quantile, _ in self.__q_points.items()]
-        instances = cudf.concat(sections, axis=1, ignore_index=False)
-
-        return instances
-
     def exc(self, partitions: list[pr.Partitions], reference: pd.DataFrame):
         """
 
@@ -70,13 +43,16 @@ class Interface:
         # Delayed tasks
         __data = dask.delayed(src.algorithms.data.Data(
             service=self.__service, s3_parameters=self.__s3_parameters, arguments=self.__arguments).exc)
+        __quantiles = dask.delayed(src.algorithms.quantiles.Quantiles().exc)
+        __extrema = dask.delayed(src.algorithms.extrema.Extrema().exc)
         __persist = dask.delayed(src.algorithms.persist.Persist(reference=reference).exc)
 
         computations = []
         for partition in partitions[:4]:
             data = __data(partition=partition)
-            metrics = self.__get_metrics(data=data)
-            message = __persist(metrics=metrics, partition=partition)
+            quantiles = __quantiles(data=data)
+            extrema = __extrema(data=data)
+            message = __persist(quantiles=quantiles, extrema=extrema, partition=partition)
             computations.append(message)
         messages = dask.compute(computations, scheduler='threads')[0]
 
