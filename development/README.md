@@ -3,9 +3,6 @@
 
 ## Environments
 
-
-<br>
-
 ### Remote Development
 
 For this Python project/template, the remote development environment requires
@@ -191,16 +188,24 @@ aws s3api head-object --bucket {bucket.name} --key {key.string}
 * [EMR & Custom Images](https://docs.aws.amazon.com/emr/latest/EMR-on-EKS-DevelopmentGuide/docker-custom-images-steps.html)
 * [EMR Pricing](https://aws.amazon.com/emr/pricing/)
 
-Engineering
-* [Dockerfile](https://docs.docker.com/reference/dockerfile/)
-* [requirements.txt](https://pip.pypa.io/en/stable/reference/requirements-file-format/)
+<br>
 
 ECS
 * [Amazon ECS task definitions for GPU workloads](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-gpu.html)
 * [Run Amazon ECS or Fargate tasks with Step Functions](https://docs.aws.amazon.com/step-functions/latest/dg/connect-ecs.html)
 
+<br>
+
 BATCH
 * [Use a GPU workload AMI](https://docs.aws.amazon.com/batch/latest/userguide/batch-gpu-ami.html)
+
+
+<br>
+
+Engineering
+* [Dockerfile](https://docs.docker.com/reference/dockerfile/)
+* [requirements.txt](https://pip.pypa.io/en/stable/reference/requirements-file-format/)
+
 
 
 <br>
