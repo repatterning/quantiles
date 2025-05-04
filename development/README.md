@@ -3,6 +3,7 @@
 
 ## Environments
 
+* [DASK, EMR, Clusters](https://yarn.dask.org/en/latest/aws-emr.html)
 * [rapids.ai & Amazon EMR](https://docs.nvidia.com/ai-enterprise/deployment/spark-rapids-accelerator/latest/emr.html)
 * [rapids.ai, EMR, EKS](https://aws.amazon.com/blogs/containers/run-spark-rapids-ml-workloads-with-gpus-on-amazon-emr-on-eks/)
 * [Use the Nvidia RAPIDS Accelerator for Apache Spark](https://docs.aws.amazon.com/emr/latest/ReleaseGuide/emr-spark-rapids.html)
@@ -14,6 +15,8 @@
 * [Dockerfile](https://docs.docker.com/reference/dockerfile/)
 * [requirements.txt](https://pip.pypa.io/en/stable/reference/requirements-file-format/)
 * [cutting cost](https://developer.nvidia.com/blog/accelerated-data-analytics-faster-time-series-analysis-with-rapids-cudf/)
+* [Configure Docker for use with Amazon EMR clusters](https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-plan-docker.html)
+* [EMR Pricing](https://aws.amazon.com/emr/pricing/)
 
 
 
