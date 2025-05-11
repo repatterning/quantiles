@@ -3,19 +3,6 @@
 
 ## Environments
 
-* [rapids.ai & Amazon EMR](https://docs.nvidia.com/ai-enterprise/deployment/spark-rapids-accelerator/latest/emr.html)
-* [rapids.ai, EMR, EKS](https://aws.amazon.com/blogs/containers/run-spark-rapids-ml-workloads-with-gpus-on-amazon-emr-on-eks/)
-* [Use the Nvidia RAPIDS Accelerator for Apache Spark](https://docs.aws.amazon.com/emr/latest/ReleaseGuide/emr-spark-rapids.html)
-  * [Images](https://docs.aws.amazon.com/emr/latest/EMR-on-EKS-DevelopmentGuide/docker-custom-images-steps.html)
-  * [Quickstart](https://docs.nvidia.com/spark-rapids/user-guide/latest/qualification/quickstart.html)
-* [Amazon EMR, Python, Spark](https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-gs.html#emr-getting-started-plan-and-configure)
-* [Amazon EMR, Dockerfile](https://github.com/awslabs/data-on-eks/blob/main/ai-ml/emr-spark-rapids/examples/xgboost/Dockerfile)
-* [Dockerfile](https://docs.docker.com/reference/dockerfile/)
-* [requirements.txt](https://pip.pypa.io/en/stable/reference/requirements-file-format/)
-* [cutting cost](https://developer.nvidia.com/blog/accelerated-data-analytics-faster-time-series-analysis-with-rapids-cudf/)
-
-
-<br>
 
 ### Remote Development
 
@@ -27,7 +14,7 @@ For this Python project/template, the remote development environment requires
 An image is built via the command
 
 ```shell
-docker build . --file .devcontainer/Dockerfile -t distributing
+docker build . --file .devcontainer/Dockerfile -t points
 ```
 
 On success, the output of
@@ -40,25 +27,25 @@ should include
 
 <br>
 
-| repository   | tag    | image id | created  | size     |
-|:-------------|:-------|:---------|:---------|:---------|
-| distributing | latest | $\ldots$ | $\ldots$ | $\ldots$ |
+| repository | tag    | image id | created  | size     |
+|:-----------|:-------|:---------|:---------|:---------|
+| points     | latest | $\ldots$ | $\ldots$ | $\ldots$ |
 
 
 <br>
 
-Subsequently, run an instance of the image `distributing` via:
+Subsequently, run an instance of the image `points` via:
 
 
 ```shell
-docker run --rm --gpus all -i -t -p 8000:8000 -w /app --mount
+docker run --rm --gpus all -i -t -p 8050:8050 -w /app --mount
     type=bind,src="$(pwd)",target=/app 
-      -v ~/.aws:/root/.aws distributing
+      -v ~/.aws:/root/.aws points
 ```
 
 <br>
 
-Herein, `-p 8000:8000` maps the host port `8000` to container port `8000`.  Note, the container's working environment,
+Herein, `-p 8050:8050` maps the host port `8050` to container port `8050`.  Note, the container's working environment,
 i.e., `-w`, must be inline with this project's top directory.  Additionally, visit the links for more about the flags/options $\rightarrow$
 
 * --rm: [automatically remove container](https://docs.docker.com/engine/reference/commandline/run/#:~:text=a%20container%20exits-,%2D%2Drm,-Automatically%20remove%20the)
@@ -70,7 +57,7 @@ i.e., `-w`, must be inline with this project's top directory.  Additionally, vis
 
 <br>
 
-The part `-v ~/.aws:/root/.aws` ascertains Amazon Web Services interactions via containers. Get the name of a running instance of ``distributing`` via:
+The part `-v ~/.aws:/root/.aws` ascertains Amazon Web Services interactions via containers. Get the name of a running instance of ``points`` via:
 
 ```shell
 docker ps --all
