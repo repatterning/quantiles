@@ -1,7 +1,8 @@
-import logging
-import os
-import pandas as pd
+"""Module persist.py"""
 import json
+import os
+
+import pandas as pd
 
 import config
 import src.elements.partitions as pr
@@ -9,6 +10,9 @@ import src.functions.objects
 
 
 class Persist:
+    """
+    Persist
+    """
 
     def __init__(self, reference: pd.DataFrame):
         """
@@ -40,9 +44,9 @@ class Persist:
     def exc(self, quantiles: pd.DataFrame, extrema: pd.DataFrame, partition: pr.Partitions):
         """
 
-        :param quantiles:
-        :param extrema:
-        :param partition:
+        :param quantiles: The quantiles
+        :param extrema: The extrema
+        :param partition: Refer to src/elements/partitions.py
         :return:
         """
 
