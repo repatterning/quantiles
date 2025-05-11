@@ -1,7 +1,11 @@
-
+"""Module extrema.py"""
 import pandas as pd
 
+
 class Extrema:
+    """
+    Per gauge, determines the daily minimum and maximum levels
+    """
 
     def __init__(self):
 
@@ -10,10 +14,9 @@ class Extrema:
     @staticmethod
     def __get_extrema(frame: pd.DataFrame) -> pd.DataFrame:
         """
-        Determines each day's minimum & maximum measurements, per sequence.
 
+        :param frame: The data of a gauge
         :return:
-            A CUDF data frame of extrema
         """
 
         calc: pd.DataFrame = frame.groupby(
@@ -26,6 +29,11 @@ class Extrema:
         return matrix
 
     def exc(self, data: pd.DataFrame) -> pd.DataFrame:
+        """
+
+        :param data: The data of a gauge
+        :return:
+        """
 
         matrix = self.__get_extrema(frame=data[['datestr', 'measure']])
         matrix.rename(columns=self.__rename, inplace=True)
