@@ -15,6 +15,6 @@ pytest-cov>=5.0
 pylint>=3.2.5
 flake8>=7.1
 dask[complete]
---extra-index-url=https://pypi.nvidia.com
+--extra-index-url https://pypi.nvidia.com
 cudf-cu12==25.4.*
 dask-cudf-cu12==25.4.*
