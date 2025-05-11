@@ -48,7 +48,7 @@ class Interface:
 
         # Compute
         computations = []
-        for partition in partitions[:2]:
+        for partition in partitions:
             data = _data(partition=partition)
             quantiles = _quantiles(data=data)
             extrema = _extrema(data=data)
