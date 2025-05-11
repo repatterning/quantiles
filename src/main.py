@@ -46,7 +46,6 @@ if __name__ == '__main__':
                         datefmt='%Y-%m-%d %H:%M:%S')
 
     # Modules
-    import src.algorithms.interface
     import src.assets.interface
     import src.elements.s3_parameters as s3p
     import src.elements.service as sr
