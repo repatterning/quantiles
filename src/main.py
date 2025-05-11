@@ -19,15 +19,16 @@ def main():
     # The time series partitions, the reference sheet of gauges
     partitions, reference = src.assets.interface.Interface(
         service=service, s3_parameters=s3_parameters, arguments=arguments).exc()
+    logger.info(partitions)
     logger.info(reference)
 
     # Calculating quantiles
-    src.algorithms.interface.Interface(
+    src.threads.interface.Interface(
         service=service, s3_parameters=s3_parameters, arguments=arguments).exc(partitions=partitions, reference=reference)
 
     # Transferring calculations to an Amazon S3 (Simple Storage Service) bucket
-    src.transfer.interface.Interface(
-        connector=connector, service=service, s3_parameters=s3_parameters).exc()
+    # src.transfer.interface.Interface(
+    #     connector=connector, service=service, s3_parameters=s3_parameters).exc()
 
     # Cache
     src.functions.cache.Cache().exc()
@@ -51,6 +52,7 @@ if __name__ == '__main__':
     import src.elements.service as sr
     import src.functions.cache
     import src.preface.interface
+    import src.threads.interface
     import src.transfer.interface
 
     connector: boto3.session.Session
