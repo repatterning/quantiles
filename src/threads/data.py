@@ -1,8 +1,7 @@
-
+"""Module data.py"""
+import dask.dataframe as ddf
 import numpy as np
 import pandas as pd
-
-import dask.dataframe as ddf
 
 import src.elements.partitions as pr
 import src.elements.s3_parameters as s3p
