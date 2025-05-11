@@ -7,11 +7,10 @@ import pandas as pd
 import src.elements.partitions as pr
 import src.elements.s3_parameters as s3p
 import src.elements.service as sr
-
 import src.threads.data
-import src.threads.quantiles
 import src.threads.extrema
 import src.threads.persist
+import src.threads.quantiles
 
 
 class Interface:
