@@ -1,10 +1,9 @@
 """
 Module numerics.py
 """
-import logging
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 
 
 class Quantile:
