@@ -3,7 +3,6 @@
 
 ## Environments
 
-
 ### Remote Development
 
 For this Python project/template, the remote development environment requires
