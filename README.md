@@ -1,6 +1,6 @@
 <br>
 
-Numerics
+Quantiles
 
 <br>
 <br>
