@@ -5,7 +5,6 @@ import pandas as pd
 
 import src.assets.gauges
 import src.assets.menu
-import src.assets.partitions
 import src.assets.reference
 import src.elements.partitions as pr
 import src.elements.s3_parameters as s3p
@@ -34,14 +33,14 @@ class Interface:
         self.__arguments = arguments
 
     @staticmethod
-    def __structure(partitions: pd.DataFrame) -> list[pr.Partitions]:
+    def __structure(gauges: pd.DataFrame) -> list[pr.Partitions]:
         """
 
-        :param partitions: The time series partitions.
+        :param gauges: The time series partitions.
         :return:
         """
 
-        values: list[dict] = partitions.copy().reset_index(drop=True).to_dict(orient='records')
+        values: list[dict] = gauges.copy().reset_index(drop=True).to_dict(orient='records')
 
         return [pr.Partitions(**value) for value in values]
 
@@ -55,15 +54,11 @@ class Interface:
         gauges = src.assets.gauges.Gauges(
             service=self.__service, s3_parameters=self.__s3_parameters, arguments=self.__arguments).exc()
 
-        # Strings for data reading.  If self.__arguments.get('reacquire') is False, the partitions will be those
-        # of excerpt ...
-        partitions = src.assets.partitions.Partitions(data=gauges, arguments=self.__arguments).exc()
-
         # The reference sheet of gauges.  Each instance encodes the attributes of a gauge.
         reference = src.assets.reference.Reference(
-            s3_parameters=self.__s3_parameters).exc(ts_id=partitions['ts_id'].unique())
+            s3_parameters=self.__s3_parameters).exc(ts_id=gauges['ts_id'].unique())
 
         # Menu: For selecting a gauge's graph of quantiles via the gauge's time series identifier.
         src.assets.menu.Menu().exc(reference=reference)
 
-        return self.__structure(partitions=partitions), reference
+        return self.__structure(gauges=gauges), reference
