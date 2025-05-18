@@ -20,7 +20,6 @@ def main():
     partitions, reference = src.assets.interface.Interface(
         service=service, s3_parameters=s3_parameters, arguments=arguments).exc()
     logger.info(partitions)
-    logger.info(reference)
 
     # Calculating quantiles
     src.threads.interface.Interface(
@@ -28,7 +27,7 @@ def main():
 
     # Transferring calculations to an Amazon S3 (Simple Storage Service) bucket
     src.transfer.interface.Interface(
-        connector=connector, service=service, s3_parameters=s3_parameters).exc()
+       connector=connector, service=service, s3_parameters=s3_parameters).exc()
 
     # Cache
     src.functions.cache.Cache().exc()
