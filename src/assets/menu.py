@@ -27,12 +27,16 @@ class Menu:
         :return:
         """
 
-        names = (reference['station_name'] + '/' + reference['catchment_name']).to_numpy()
-        frame = pd.DataFrame(data={'desc': reference['ts_id'].to_numpy(),
-                                   'name': names})
+        # Sort
+        excerpt = reference.copy().sort_values(by=['catchment_name', 'station_name'], ascending=True)
 
+        # Nodes
+        names = (excerpt['station_name'] + '/' + excerpt['catchment_name']).to_numpy()
+        frame = pd.DataFrame(data={'desc': excerpt['ts_id'].to_numpy(),
+                                   'name': names})
         nodes = frame.to_dict(orient='records')
 
+        # Persist
         message = src.functions.objects.Objects().write(
             nodes=nodes, path=os.path.join(self.__configurations.menu_, 'menu.json'))
         logging.info('Graphing Menu ->\n%s', message)
